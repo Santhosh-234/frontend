@@ -61,4 +61,21 @@ export class BaseLayoutBlueprint {
         }
 
     }
+
+
+    public static getBaseLayoutBlueprintDataDepthOne = (primaryKey: string) =>{
+        return this._BaseLayoutBlueprint[primaryKey];
+   }
+   public static getBaseLayoutBlueprintDataDepthTwo = (primaryKey: string, secondaryKey: string) =>{
+       return this._BaseLayoutBlueprint[primaryKey][secondaryKey];
+   }
+   public static getBaseLayoutBlueprintDataDepthThree = (primaryKey: string, secondaryKey: string, tertiaryKey: string) =>{
+       return this._BaseLayoutBlueprint[primaryKey][secondaryKey][tertiaryKey];
+   }
+   public static getBaseLayoutBlueprintDataDepthFour = (primaryKey: string, secondaryKey: string, tertiaryKey: string, fourthKey: string) =>{
+       return this._BaseLayoutBlueprint[primaryKey][secondaryKey][tertiaryKey][fourthKey];
+   }
+   public static getUserUniqueURI = (retailerCode: string, hierachyCode: string, profileCode: string) => {
+       return this._BaseLayoutBlueprint["apiHelper"][retailerCode][hierachyCode][profileCode];
+   }
 }

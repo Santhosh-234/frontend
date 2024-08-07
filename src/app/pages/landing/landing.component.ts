@@ -1,7 +1,7 @@
 // src/app/landing/landing.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { LoginComponent } from '../login/login.component';
+import { LoginComponent } from '../../base-layout/login/login.component';
 import { CommonModule } from '@angular/common';
 import { defaultLandingConfig, LandingConfig } from '../../../blueprints/landing/landing.blueprint';
 

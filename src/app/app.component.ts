@@ -4,6 +4,8 @@ import { HeaderComponent } from "./components/header/header.component";
 import { MainComponent } from "./components/main/main.component";
 import { FooterComponent } from "./components/footer/footer.component";
 import { RouterOutlet } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-root',

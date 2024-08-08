@@ -5,11 +5,9 @@ import { BaseComponent } from './layout/base/base.component';
 import { HomeComponent } from './pages/home/home.component';
 import { MsalGuard } from '@azure/msal-angular';
 
-export const routes: Routes = [
-  { path: '', component: LandingComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'home', component: BaseComponent, canActivate: [MsalGuard], children: [
-    { path: '', component: HomeComponent }
-  ]},
-  { path: '**', redirectTo: '' }
+export const routes: Routes = [{
+  path: "",
+  component: LoginComponent,
+  pathMatch: 'full'
+}
 ];

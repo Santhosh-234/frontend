@@ -1,19 +1,29 @@
-<div class="flex items-center justify-center min-h-screen bg-gray-100">
-  <div class="bg-white p-8 rounded shadow-md w-96">
-    <form (ngSubmit)="signInWithMicrosoft()">
-      <h2 class="text-2xl text-black font-bold mb-4">Login</h2>
-      <button
-        type="submit"
-        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105"
-      >
-        Login with Microsoft
-      </button>
-    </form>
-    <div *ngIf="loading" class="mt-4 text-center text-blue-500">
-      Processing...
-    </div>
-    <div *ngIf="loginError" class="mt-4 text-center text-red-500">
-      Login failed. Please try again.
-    </div>
+<div class="fullWidth-fullHeight">
+  <div class="helix-container">
+      <div class="topbar">
+              <app-header [authenticatedView] = "'false'" class="fullWidth-fullHeight"></app-header>
+      </div>
+      <div class="sidebar">
+              <h1>sidenav</h1>
+      </div>
+      <div class="contentbody router-outlet-container">
+          <div class="center-element-page">
+              <div [class]="loginBlueprint.sectionClassName" [id]="loginBlueprint.sectionCode">
+                  <div>
+                      <img [class]="loginBlueprint.element.LOGO.className" [src]="loginBlueprint.element.LOGO.content" [alt]="loginBlueprint.element.LOGO.sectionName"/>
+                  </div>
+                  <div>
+                      <h2 [class]="loginBlueprint.element.WLCM_TXT.className" >{{loginBlueprint.element.WLCM_TXT.content}}
+                      </h2>
+                  </div>
+                  <div>
+                      <button [class]="loginBlueprint.element.LGN_BTN.className + ' font'" (click)="login()">
+                          {{loginBlueprint.element.LGN_BTN.content}}
+                      </button>
+                  </div>
+                </div>
+          </div>
+          
+      </div>
   </div>
 </div>

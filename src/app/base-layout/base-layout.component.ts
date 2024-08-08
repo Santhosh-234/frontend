@@ -59,26 +59,26 @@ export class BaseLayoutComponent implements OnInit{
   baseLayoutIntialiser = async () => {
     await this.loginService.getWebAccessToken();
     await this.loginService.getPbiAccessToken();
-    let userhasAccess: any = await this.baseLayoutService.checkForAppAccess();
+    //let userhasAccess: any = await this.baseLayoutService.checkForAppAccess();
     let retailerMetaData;
-    if (userhasAccess) {
-      retailerMetaData = await this.baseLayoutService.retailerHierarchyAccessMetaDataGenerator();
-      // has access but no retailer access
-      if (retailerMetaData.length == 0) {
-        this.router.navigate(['app/no-access']);
-      }
-      this.store.dispatch(updateuserAccess({ accessData: retailerMetaData }))
-      await this.validateAndDetermineRedirect(retailerMetaData.length, retailerMetaData);
-    } else {
-      this.router.navigate(['app/no-access']);
-      return "Done"; // Return immediately when user doesn't have access.
-    }
-    await this.baseLayoutService.initialiseRetailerSpecificMount();
-    this.profile = await this.msalConfigService.getProfile();
-    this.baseLayoutService.profileDetails = this.profile;
-    this.profilePic = await this.msalConfigService.getProfilePic();
-    return "Done"; 
-  }
+  //   if (userhasAccess) {
+  //     retailerMetaData = await this.baseLayoutService.retailerHierarchyAccessMetaDataGenerator();
+  //     // has access but no retailer access
+  //     if (retailerMetaData.length == 0) {
+  //       this.router.navigate(['app/no-access']);
+  //     }
+  //     this.store.dispatch(updateuserAccess({ accessData: retailerMetaData }))
+  //     await this.validateAndDetermineRedirect(retailerMetaData.length, retailerMetaData);
+  //   } else {
+  //     this.router.navigate(['app/no-access']);
+  //     return "Done"; // Return immediately when user doesn't have access.
+  //   }
+  //   await this.baseLayoutService.initialiseRetailerSpecificMount();
+  //   this.profile = await this.msalConfigService.getProfile();
+  //   this.baseLayoutService.profileDetails = this.profile;
+  //   this.profilePic = await this.msalConfigService.getProfilePic();
+  //   return "Done"; 
+ }
 
 
   ngOnInit(): void {

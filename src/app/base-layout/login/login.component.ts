@@ -1,83 +1,86 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { BaseLayoutService } from '../base-layout.service';
+import { Abbreviations } from '../../../blueprints/base-layout/base-layout.blueprint';
+import { LoginBluePrint } from '../../../blueprints/login/login.blueprint';
+import { MSAL_GUARD_CONFIG, MsalGuardConfiguration, MsalBroadcastService, MsalService } from '@azure/msal-angular';
+import { Subject, filter, takeUntil } from 'rxjs';
+import { InteractionStatus } from '@azure/msal-browser';
+import { environment } from '../../../environments/environment';
+import { MsalconfigService } from '../../msalconfig.service';
+import { Router } from '@angular/router';
+import { LandingComponent } from '../../pages/landing/landing.component';
+import { HeaderComponent } from "../../components/header/header.component";
 import { CommonModule } from '@angular/common';
-import { MsalService } from '@azure/msal-angular';
-import { AuthenticationResult, BrowserAuthError } from '@azure/msal-browser';
+
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [FormsModule, CommonModule]
+  imports: [LandingComponent, HeaderComponent, CommonModule]
 })
-export class LoginComponent {
-  @Output() onLoginSuccess = new EventEmitter<void>();
-  @Output() loginPopupOpened = new EventEmitter<void>();
+export class LoginComponent implements OnInit, OnDestroy {
+  isUserLoggedIn: boolean = false;
+  loginBlueprint: any = {};
 
-  loading: boolean = false;
-  loginError: boolean = false;
+  private readonly _destroy = new Subject<void>();
+  constructor(private baseLayoutService: BaseLayoutService, @Inject(MSAL_GUARD_CONFIG) private msalGuardConfig: MsalGuardConfiguration,
+    private msalBroadCastService: MsalBroadcastService,
+    private authService: MsalService, private msalConfigService: MsalconfigService, private router: Router) {
 
-  constructor(private msalService: MsalService) {}
+  }
+  ngOnDestroy(): void {
+    this._destroy.next(undefined);
+    this._destroy.complete();
+  }
+  loginIntialiser = async () => {
+    this.loginBlueprint = LoginBluePrint.getLoginBlueprintData();
+    return "Done";
+  }
+  login = async () => {
+    let response: any = null;
+    response = await this.authService.loginRedirect();
+    this.authService.instance.setActiveAccount(response.account);
+    this.authService.instance.setActiveAccount(response.account);
+  }
 
-  async signInWithMicrosoft() {
-    this.loginPopupOpened.emit();
-    this.loading = true;
-    try {
-      console.log('Clearing cache before login...');
-      this.clearCache();
+  redirectUser() {
+    this.router.navigate(['app'])
+  }
 
-      if (this.isInteractionInProgress()) {
-        console.log('Interaction is still in progress, retrying after delay...');
-        await this.delay(2000);
-      }
-
-      if (this.isInteractionInProgress()) {
-        console.error('Interaction in progress, aborting login');
-        this.loading = false;
-        this.loginError = true;
-        return;
-      }
-
-      const result: AuthenticationResult | undefined = await this.msalService.loginPopup().toPromise();
-      if (result) {
-        this.msalService.instance.setActiveAccount(result.account);
-        this.loading = false;
-        this.loginError = false;
-        this.onLoginSuccess.emit();
-      } else {
-        console.log('No result from loginPopup');
-        this.loading = false;
-        this.loginError = true;
-      }
-    } catch (error) {
-      if (error instanceof BrowserAuthError && error.errorCode === 'interaction_in_progress') {
-        console.error('Interaction in progress error:', error);
-      } else {
-        console.error('Login error:', error);
-      }
-      this.loading = false;
-      this.loginError = true;
+  checkforActiveUser() {
+    this.isUserLoggedIn = this.authService.instance.getAllAccounts().length > 0;
+    if (this.isUserLoggedIn) {
+      this.router.navigate(['app']);
     }
   }
-
-  clearCache() {
-    console.log('Clearing localStorage and sessionStorage...');
-    const msalKeys = Object.keys(localStorage).filter(key => key.includes('msal'));
-    msalKeys.forEach(key => localStorage.removeItem(key));
-
-    const sessionMsalKeys = Object.keys(sessionStorage).filter(key => key.includes('msal'));
-    sessionMsalKeys.forEach(key => sessionStorage.removeItem(key));
-
-    console.log('Cache cleared');
+  logout() {
+    //this.authService.logoutRedirect({ postLogoutRedirectUri: environment.postLogoutUrl });
   }
 
-  delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
+  ngOnInit(): void {
+    this.checkforActiveUser();
+    this.msalBroadCastService.inProgress$.pipe
+      (filter((interactionStatus: InteractionStatus) =>
+        interactionStatus == InteractionStatus.None),
+        takeUntil(this._destroy))
+      .subscribe(x => {
+        this.isUserLoggedIn = this.authService.instance.getAllAccounts().length > 0;
+        if (
+          this.authService.instance.getAllAccounts().length > 0
+        ) {
+          const accounts = this.authService.instance.getAllAccounts();
+          this.authService.instance.setActiveAccount(accounts[0]);
+          this.msalConfigService.isUserLoggedIn.next(this.isUserLoggedIn);
+          this.redirectUser();
+        }
 
-  isInteractionInProgress() {
-    const keys = [...Object.keys(localStorage), ...Object.keys(sessionStorage)];
-    return keys.some(key => key.includes('interaction_status'));
+      })
+    this.baseLayoutService.setLoaded(false);
+    this.loginIntialiser().then((data) => {
+      this.baseLayoutService.setPageLevelMetadata(Abbreviations.login);
+      this.baseLayoutService.setLoaded(true)
+    })
   }
 }

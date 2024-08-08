@@ -6,8 +6,9 @@ import { routes } from './app/app.routes';
 import { SocialAuthServiceConfig, SocialLoginModule, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { MsalModule, MSAL_INSTANCE, MSAL_GUARD_CONFIG, MSAL_INTERCEPTOR_CONFIG, MsalGuardConfiguration, MsalInterceptorConfiguration } from '@azure/msal-angular';
 import { IPublicClientApplication, PublicClientApplication, InteractionType } from '@azure/msal-browser';
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
 import { MsalInterceptor } from '@azure/msal-angular';
+import { provideHttpClient } from '@angular/common/http';
 
 export function MSALInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication({
@@ -56,6 +57,7 @@ initializeMsalInstance().then((msalInstance) => {
         MsalModule.forRoot(msalInstance, MSALGuardConfigFactory(), MSALInterceptorConfigFactory()),
         SocialLoginModule
       ),
+      (HttpClient),
       {
         provide: HTTP_INTERCEPTORS,
         useClass: MsalInterceptor,
